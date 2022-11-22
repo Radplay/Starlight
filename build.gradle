@@ -7,20 +7,12 @@ plugins {
  * Gets the version name from the latest Git tag
  */
 // https://stackoverflow.com/questions/28498688/gradle-script-to-autoversion-and-include-the-commit-hash-in-android
-def getGitCommit = { ->
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'rev-parse', '--short', 'HEAD'
-        standardOutput = stdout
-    }
-    return stdout.toString().trim()
-}
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 archivesBaseName = project.archives_base_name
-version = project.mod_version + "+fabric." + getGitCommit()
+version = project.mod_version + "+fabric."
 group = project.maven_group
 
 dependencies {
