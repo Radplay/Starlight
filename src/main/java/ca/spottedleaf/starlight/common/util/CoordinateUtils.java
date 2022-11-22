@@ -21,7 +21,7 @@ public final class CoordinateUtils {
     }
 
     public static long getChunkKey(final Entity entity) {
-        return ((long)(Mth.floor(entity.getZ()) >> 4) << 32) | ((Mth.floor(entity.getX()) >> 4) & 0xFFFFFFFFL);
+        return ((long)(Mth.floor(entity.z) >> 4) << 32) | ((Mth.floor(entity.x) >> 4) & 0xFFFFFFFFL);
     }
 
     public static long getChunkKey(final ChunkPos pos) {
@@ -87,9 +87,9 @@ public final class CoordinateUtils {
     }
 
     public static long getChunkSectionKey(final Entity entity) {
-        return ((Mth.lfloor(entity.getX()) << (SECTION_X_SHIFT - SECTION_TO_BLOCK_SHIFT)) & (SECTION_X_MASK << SECTION_X_SHIFT)) |
-                ((Mth.lfloor(entity.getY()) >> SECTION_TO_BLOCK_SHIFT) & (SECTION_Y_MASK << SECTION_Y_SHIFT)) |
-                ((Mth.lfloor(entity.getZ()) << (SECTION_Z_SHIFT - SECTION_TO_BLOCK_SHIFT)) & (SECTION_Z_MASK << SECTION_Z_SHIFT));
+        return ((Mth.lfloor(entity.x) << (SECTION_X_SHIFT - SECTION_TO_BLOCK_SHIFT)) & (SECTION_X_MASK << SECTION_X_SHIFT)) |
+                ((Mth.lfloor(entity.y) >> SECTION_TO_BLOCK_SHIFT) & (SECTION_Y_MASK << SECTION_Y_SHIFT)) |
+                ((Mth.lfloor(entity.z) << (SECTION_Z_SHIFT - SECTION_TO_BLOCK_SHIFT)) & (SECTION_Z_MASK << SECTION_Z_SHIFT));
     }
 
     public static int getChunkSectionX(final long key) {
@@ -119,7 +119,7 @@ public final class CoordinateUtils {
     }
 
     public static long getBlockKey(final Entity entity) {
-        return ((long)entity.getX() & 0x7FFFFFF) | (((long)entity.getZ() & 0x7FFFFFF) << 27) | ((long)entity.getY() << 54);
+        return ((long)entity.x & 0x7FFFFFF) | (((long)entity.z & 0x7FFFFFF) << 27) | ((long)entity.y << 54);
     }
 
     private CoordinateUtils() {

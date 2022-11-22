@@ -1,7 +1,7 @@
 package ca.spottedleaf.starlight.mixin.client.multiplayer;
 
 import ca.spottedleaf.starlight.common.light.StarLightLightingProvider;
-import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.MultiPlayerLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.core.SectionPos;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -30,7 +30,7 @@ public abstract class ClientPacketListenerMixin implements ClientGamePacketListe
     */
 
     @Shadow
-    private ClientLevel level;
+    private MultiPlayerLevel level;
 
     /**
      * Re-route light update packet to our own logic
@@ -70,7 +70,7 @@ public abstract class ClientPacketListenerMixin implements ClientGamePacketListe
     @Inject(
             method = "handleLevelChunk",
             at = @At(
-                    target = "Lnet/minecraft/client/multiplayer/ClientChunkCache;replaceWithPacketData(IILnet/minecraft/world/level/chunk/ChunkBiomeContainer;Lnet/minecraft/network/FriendlyByteBuf;Lnet/minecraft/nbt/CompoundTag;I)Lnet/minecraft/world/level/chunk/LevelChunk;",
+                    target = "Lnet/minecraft/client/multiplayer/ClientChunkCache;replaceWithPacketData(Lnet/minecraft/world/level/Level;IILnet/minecraft/network/FriendlyByteBuf;Lnet/minecraft/nbt/CompoundTag;IZ)Lnet/minecraft/world/level/chunk/LevelChunk;",
                     value = "INVOKE",
                     ordinal = 0,
                     shift = At.Shift.AFTER

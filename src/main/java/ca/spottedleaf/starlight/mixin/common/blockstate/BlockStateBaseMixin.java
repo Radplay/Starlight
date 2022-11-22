@@ -23,7 +23,7 @@ public abstract class BlockStateBaseMixin extends AbstractStateHolder<Block, Blo
     private boolean useShapeForLightOcclusion;
 
     @Shadow
-    protected BlockState.Cache cache;
+    private BlockState.Cache cache;
 
     @Unique
     private int opacityIfCached;

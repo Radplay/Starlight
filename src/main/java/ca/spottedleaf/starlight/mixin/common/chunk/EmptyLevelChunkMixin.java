@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.EmptyTickList;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.*;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,8 +16,8 @@ import java.util.function.Consumer;
 @Mixin(EmptyLevelChunk.class)
 public abstract class EmptyLevelChunkMixin extends LevelChunk implements ChunkAccess, ExtendedChunk {
 
-    public EmptyLevelChunkMixin(Level level, ChunkPos chunkPos, ChunkBiomeContainer chunkBiomeContainer) {
-        super(level, chunkPos, chunkBiomeContainer);
+    public EmptyLevelChunkMixin(Level level, ChunkPos chunkPos, Biome[] biomes) {
+        super(level, chunkPos, biomes);
     }
 
     @Override
