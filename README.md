@@ -1,6 +1,10 @@
-Starlight (Fabric)
+Starlight Legacy (Fabric)
 ==
-Fabric mod for completely rewriting the vanilla light engine.
+An **extremely** simple backport of Starlight for 1.14.x and 1.15.x with a few *really* simple updates from the original repository.
+
+[1.15.x backport by dariasc](https://github.com/dariasc/Starlight)
+
+[1.14.x backport by KingContaria](https://github.com/KingContaria/Starlight-1.14)
 
 ## Known Issues
 At this point in Starlight's development, I expect problems with mod conflicts.
