@@ -1,6 +1,6 @@
 Starlight Legacy (Fabric)
 ==
-An **extremely** simple backport of Starlight for 1.14.x and 1.15.x with a few updates from the original repository.
+An **extremely** simple backport of Starlight for 1.14.x and 1.15.x with a few *really* simple updates from the original repository.
 
 [1.15.x backport by dariasc](https://github.com/dariasc/Starlight)
 
