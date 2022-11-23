@@ -16,7 +16,6 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.dimension.Dimension;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.storage.LevelData;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
@@ -25,13 +24,15 @@ import java.util.function.BiFunction;
 @Mixin(ServerLevel.class)
 public abstract class ServerWorldMixin extends Level implements ExtendedWorld {
 
+    @Shadow public abstract ServerChunkCache getChunkSource();
+
     protected ServerWorldMixin(LevelData levelData, DimensionType dimensionType, BiFunction<Level, Dimension, ChunkSource> biFunction, ProfilerFiller profilerFiller, boolean bl) {
         super(levelData, dimensionType, biFunction, profilerFiller, bl);
     }
 
     @Override
     public final LevelChunk getChunkAtImmediately(final int chunkX, final int chunkZ) {
-        final ChunkMap storage = ((ServerChunkCache) this.getChunkSource()).chunkMap;
+        final ChunkMap storage = this.getChunkSource().chunkMap;
         final ChunkHolder holder = storage.getVisibleChunkIfPresent(CoordinateUtils.getChunkKey(chunkX, chunkZ));
 
         if (holder == null) {
@@ -45,7 +46,7 @@ public abstract class ServerWorldMixin extends Level implements ExtendedWorld {
 
     @Override
     public final ChunkAccess getAnyChunkImmediately(final int chunkX, final int chunkZ) {
-        final ChunkMap storage = ((ServerChunkCache) this.getChunkSource()).chunkMap;
+        final ChunkMap storage = this.getChunkSource().chunkMap;
         final ChunkHolder holder = storage.getVisibleChunkIfPresent(CoordinateUtils.getChunkKey(chunkX, chunkZ));
 
         return holder == null ? null : holder.getLastAvailable();

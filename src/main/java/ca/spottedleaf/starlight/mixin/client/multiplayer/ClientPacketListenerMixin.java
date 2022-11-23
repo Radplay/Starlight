@@ -21,12 +21,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ClientPacketListener.class)
+@Mixin(value = ClientPacketListener.class, priority = 1001)
 public abstract class ClientPacketListenerMixin implements ClientGamePacketListener {
 
     /*
-    The call behaviors in the packet handler are much more clear about how they should affect the light engine,
-    and as a result makes the client light load/unload more reliable
+        The call behaviors in the packet handler are much more clear about how they should affect the light engine,
+        and as a result makes the client light load/unload more reliable
     */
 
     @Shadow
@@ -46,7 +46,7 @@ public abstract class ClientPacketListenerMixin implements ClientGamePacketListe
     )
     private void loadLightDataHook(final LevelLightEngine lightEngine, final LightLayer lightType, final SectionPos pos,
                                    final @Nullable DataLayer nibble) {
-        ((StarLightLightingProvider)this.level.getChunkSource().getLightEngine()).clientUpdateLight(lightType, pos, nibble, false);
+        ((StarLightLightingProvider)this.level.getChunkSource().getLightEngine()).clientUpdateLight(lightType, pos, nibble);
     }
 
 
@@ -84,6 +84,6 @@ public abstract class ClientPacketListenerMixin implements ClientGamePacketListe
             // failed to load
             return;
         }
-        ((StarLightLightingProvider)this.level.getChunkSource().getLightEngine()).clientChunkLoad(new ChunkPos(chunkX, chunkZ), chunk);
+        ((StarLightLightingProvider) this.level.getChunkSource().getLightEngine()).clientChunkLoad(new ChunkPos(chunkX, chunkZ), chunk);
     }
 }

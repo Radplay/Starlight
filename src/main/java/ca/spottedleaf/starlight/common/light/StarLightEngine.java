@@ -5,7 +5,6 @@ import ca.spottedleaf.starlight.common.chunk.ExtendedChunkSection;
 import ca.spottedleaf.starlight.common.util.CoordinateUtils;
 import ca.spottedleaf.starlight.common.util.IntegerUtil;
 import ca.spottedleaf.starlight.common.util.WorldUtil;
-import ca.spottedleaf.starlight.common.world.ExtendedWorld;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.ShortCollection;
 import it.unimi.dsi.fastutil.shorts.ShortIterator;
@@ -291,7 +290,7 @@ public abstract class StarLightEngine {
             return section == EMPTY_CHUNK_SECTION ? AIR_BLOCK_STATE : section.getBlockState(worldX & 15, worldY & 15, worldZ & 15);
         }
 
-        return null;
+        return AIR_BLOCK_STATE;
     }
 
     protected final BlockState getBlockState(final int sectionIndex, final int localIndex) {
@@ -301,7 +300,7 @@ public abstract class StarLightEngine {
             return section == EMPTY_CHUNK_SECTION ? AIR_BLOCK_STATE : section.states.get(localIndex);
         }
 
-        return null;
+        return AIR_BLOCK_STATE;
     }
 
     protected final int getLightLevel(final int worldX, final int worldY, final int worldZ) {

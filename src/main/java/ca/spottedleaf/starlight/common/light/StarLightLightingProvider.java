@@ -11,7 +11,7 @@ public interface StarLightLightingProvider {
     public StarLightInterface getLightEngine();
 
     public void clientUpdateLight(final LightLayer lightType, final SectionPos pos,
-                                  final DataLayer nibble, final boolean trustEdges);
+                            final DataLayer nibble);
 
     public void clientRemoveLightData(final ChunkPos chunkPos);
 

@@ -743,19 +743,13 @@ public final class SkyStarLightEngine extends StarLightEngine {
         this.checkNullSection(worldX >> 4, startY >> 4, worldZ >> 4, extrudeInitialised);
 
         BlockState above = this.getBlockState(worldX, startY + 1, worldZ);
-        if (above == null) {
-            above = AIR_BLOCK_STATE;
-        }
 
         for (;startY >= (this.minLightSection << 4); --startY) {
             if ((startY & 15) == 15) {
                 // ensure this section is always checked
                 this.checkNullSection(worldX >> 4, startY >> 4, worldZ >> 4, extrudeInitialised);
             }
-            BlockState current = this.getBlockState(worldX, startY, worldZ);
-            if (current == null) {
-                current = AIR_BLOCK_STATE;
-            }
+            final BlockState current = this.getBlockState(worldX, startY, worldZ);
 
             final VoxelShape fromShape;
             if (((ExtendedAbstractBlockState)above).isConditionallyFullOpaque()) {

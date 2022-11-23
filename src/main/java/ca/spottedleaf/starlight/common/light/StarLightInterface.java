@@ -5,9 +5,9 @@ import ca.spottedleaf.starlight.common.util.CoordinateUtils;
 import ca.spottedleaf.starlight.common.util.WorldUtil;
 import ca.spottedleaf.starlight.common.world.ExtendedWorld;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.shorts.ShortCollection;
 import it.unimi.dsi.fastutil.shorts.ShortOpenHashSet;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.ServerLevel;
@@ -20,9 +20,9 @@ import net.minecraft.world.level.chunk.DataLayer;
 import net.minecraft.world.level.chunk.LightChunkGetter;
 import net.minecraft.world.level.lighting.LayerLightEventListener;
 import net.minecraft.world.level.lighting.LevelLightEngine;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -74,7 +74,6 @@ public final class StarLightInterface {
         }
         this.lightEngine = lightEngine;
         this.skyReader = !hasSkyLight ? LayerLightEventListener.DummyLightLayerEventListener.INSTANCE : new LayerLightEventListener() {
-
             @Override
             public DataLayer getDataLayerData(final SectionPos pos) {
                 final ChunkAccess chunk = StarLightInterface.this.getAnyChunkNow(pos.getX(), pos.getZ());
@@ -97,78 +96,7 @@ public final class StarLightInterface {
 
             @Override
             public int getLightValue(final BlockPos blockPos) {
-                final int x = blockPos.getX();
-                int y = blockPos.getY();
-                final int z = blockPos.getZ();
-
-                final ChunkAccess chunk = StarLightInterface.this.getAnyChunkNow(x >> 4, z >> 4);
-                if (chunk == null || (!StarLightInterface.this.isClientSide && !chunk.isLightCorrect()) || !chunk.getStatus().isOrAfter(ChunkStatus.LIGHT)) {
-                    return 15;
-                }
-
-                int sectionY = y >> 4;
-
-                if (sectionY > StarLightInterface.this.maxLightSection) {
-                    return 15;
-                }
-
-                if (sectionY < StarLightInterface.this.minLightSection) {
-                    sectionY = StarLightInterface.this.minLightSection;
-                    y = sectionY << 4;
-                }
-
-                final SWMRNibbleArray[] nibbles = ((ExtendedChunk)chunk).getSkyNibbles();
-                final SWMRNibbleArray immediate = nibbles[sectionY - StarLightInterface.this.minLightSection];
-
-                if (StarLightInterface.this.isClientSide) {
-                    if (!immediate.isNullNibbleUpdating()) {
-                        return immediate.getUpdating(x, y, z);
-                    }
-                } else {
-                    if (!immediate.isNullNibbleVisible()) {
-                        return immediate.getVisible(x, y, z);
-                    }
-                }
-
-                final boolean[] emptinessMap = ((ExtendedChunk)chunk).getSkyEmptinessMap();
-
-                if (emptinessMap == null) {
-                    return 15;
-                }
-
-                // are we above this chunk's lowest empty section?
-                int lowestY = StarLightInterface.this.minLightSection - 1;
-                for (int currY = StarLightInterface.this.maxSection; currY >= StarLightInterface.this.minSection; --currY) {
-                    if (emptinessMap[currY - StarLightInterface.this.minSection]) {
-                        continue;
-                    }
-
-                    // should always be full lit here
-                    lowestY = currY;
-                    break;
-                }
-
-                if (sectionY > lowestY) {
-                    return 15;
-                }
-
-                // this nibble is going to depend solely on the skylight data above it
-                // find first non-null data above (there does exist one, as we just found it above)
-                for (int currY = sectionY + 1; currY <= StarLightInterface.this.maxLightSection; ++currY) {
-                    final SWMRNibbleArray nibble = nibbles[currY - StarLightInterface.this.minLightSection];
-                    if (StarLightInterface.this.isClientSide) {
-                        if (!nibble.isNullNibbleUpdating()) {
-                            return nibble.getUpdating(x, 0, z);
-                        }
-                    } else {
-                        if (!nibble.isNullNibbleVisible()) {
-                            return nibble.getVisible(x, 0, z);
-                        }
-                    }
-                }
-
-                // should never reach here
-                return 15;
+                return StarLightInterface.this.getSkyLightValue(blockPos, StarLightInterface.this.getAnyChunkNow(blockPos.getX() >> 4, blockPos.getZ() >> 4));
             }
 
             @Override
@@ -177,7 +105,6 @@ public final class StarLightInterface {
             }
         };
         this.blockReader = !hasBlockLight ? LayerLightEventListener.DummyLightLayerEventListener.INSTANCE : new LayerLightEventListener() {
-
             @Override
             public DataLayer getDataLayerData(final SectionPos pos) {
                 final ChunkAccess chunk = StarLightInterface.this.getAnyChunkNow(pos.getX(), pos.getZ());
@@ -191,26 +118,7 @@ public final class StarLightInterface {
 
             @Override
             public int getLightValue(final BlockPos blockPos) {
-                final int cx = blockPos.getX() >> 4;
-                final int cy = blockPos.getY() >> 4;
-                final int cz = blockPos.getZ() >> 4;
-
-                if (cy < StarLightInterface.this.minLightSection || cy > StarLightInterface.this.maxLightSection) {
-                    return 0;
-                }
-
-                final ChunkAccess chunk = StarLightInterface.this.getAnyChunkNow(cx, cz);
-
-                if (chunk == null) {
-                    return 0;
-                }
-
-                final SWMRNibbleArray nibble = ((ExtendedChunk)chunk).getBlockNibbles()[cy - StarLightInterface.this.minLightSection];
-                if (StarLightInterface.this.isClientSide) {
-                    return nibble.getUpdating(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-                } else {
-                    return nibble.getVisible(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-                }
+                return StarLightInterface.this.getBlockLightValue(blockPos, StarLightInterface.this.getAnyChunkNow(blockPos.getX() >> 4, blockPos.getZ() >> 4));
             }
 
             @Override
@@ -218,6 +126,104 @@ public final class StarLightInterface {
                 StarLightInterface.this.sectionChange(pos, notReady);
             }
         };
+    }
+
+    protected int getSkyLightValue(final BlockPos blockPos, final ChunkAccess chunk) {
+        final int x = blockPos.getX();
+        int y = blockPos.getY();
+        final int z = blockPos.getZ();
+
+        final int minSection = this.minSection;
+        final int maxSection = this.maxSection;
+        final int minLightSection = this.minLightSection;
+        final int maxLightSection = this.maxLightSection;
+
+        if (chunk == null || (!this.isClientSide && !chunk.isLightCorrect()) || !chunk.getStatus().isOrAfter(ChunkStatus.LIGHT)) {
+            return 15;
+        }
+
+        int sectionY = y >> 4;
+
+        if (sectionY > maxLightSection) {
+            return 15;
+        }
+
+        if (sectionY < minLightSection) {
+            sectionY = minLightSection;
+            y = sectionY << 4;
+        }
+
+        final SWMRNibbleArray[] nibbles = ((ExtendedChunk)chunk).getSkyNibbles();
+        final SWMRNibbleArray immediate = nibbles[sectionY - minLightSection];
+
+        if (!immediate.isNullNibbleVisible()) {
+            return immediate.getVisible(x, y, z);
+        }
+
+        final boolean[] emptinessMap = ((ExtendedChunk)chunk).getSkyEmptinessMap();
+
+        if (emptinessMap == null) {
+            return 15;
+        }
+
+        // are we above this chunk's lowest empty section?
+        int lowestY = minLightSection - 1;
+        for (int currY = maxSection; currY >= minSection; --currY) {
+            if (emptinessMap[currY - minSection]) {
+                continue;
+            }
+
+            // should always be full lit here
+            lowestY = currY;
+            break;
+        }
+
+        if (sectionY > lowestY) {
+            return 15;
+        }
+
+        // this nibble is going to depend solely on the skylight data above it
+        // find first non-null data above (there does exist one, as we just found it above)
+        for (int currY = sectionY + 1; currY <= maxLightSection; ++currY) {
+            final SWMRNibbleArray nibble = nibbles[currY - minLightSection];
+            if (!nibble.isNullNibbleVisible()) {
+                return nibble.getVisible(x, 0, z);
+            }
+        }
+
+        // should never reach here
+        return 15;
+    }
+
+    protected int getBlockLightValue(final BlockPos blockPos, final ChunkAccess chunk) {
+        final int y = blockPos.getY();
+        final int cy = y >> 4;
+
+        final int minLightSection = this.minLightSection;
+        final int maxLightSection = this.maxLightSection;
+
+        if (cy < minLightSection || cy > maxLightSection) {
+            return 0;
+        }
+
+        if (chunk == null) {
+            return 0;
+        }
+
+        final SWMRNibbleArray nibble = ((ExtendedChunk)chunk).getBlockNibbles()[cy - minLightSection];
+        return nibble.getVisible(blockPos.getX(), y, blockPos.getZ());
+    }
+
+    public int getRawBrightness(final BlockPos pos, final int ambientDarkness) {
+        final ChunkAccess chunk = this.getAnyChunkNow(pos.getX() >> 4, pos.getZ() >> 4);
+
+        final int sky = this.getSkyLightValue(pos, chunk) - ambientDarkness;
+        // Don't fetch the block light level if the skylight level is 15, since the value will never be higher.
+        if (sky == 15) {
+            return 15;
+        }
+        final int block = this.getBlockLightValue(pos, chunk);
+        return Math.max(sky, block);
     }
 
     public LayerLightEventListener getSkyReader() {

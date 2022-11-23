@@ -5,7 +5,6 @@ import net.minecraft.world.level.Level;
 public final class WorldUtil {
 
     // min, max are inclusive
-    // TODO update these for 1.17
 
     public static int getMaxSection(final Level world) {
         return 15;
