@@ -3,7 +3,6 @@ package ca.spottedleaf.starlight.mixin.common.chunk;
 import ca.spottedleaf.starlight.common.light.SWMRNibbleArray;
 import ca.spottedleaf.starlight.common.light.StarLightEngine;
 import ca.spottedleaf.starlight.common.chunk.ExtendedChunk;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.TickList;
@@ -86,7 +85,7 @@ public abstract class LevelChunkMixin implements ExtendedChunk, ChunkAccess {
             method = "<init>(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/chunk/ProtoChunk;)V",
             at = @At("TAIL")
     )
-    public void onTransitionToFull(final Level level, final ProtoChunk protoChunk, final CallbackInfo ci) {
+    public void onTransitionToFull(final Level world, final ProtoChunk protoChunk, final CallbackInfo ci) {
         this.setBlockNibbles(((ExtendedChunk)protoChunk).getBlockNibbles());
         this.setSkyNibbles(((ExtendedChunk)protoChunk).getSkyNibbles());
         this.setSkyEmptinessMap(((ExtendedChunk)protoChunk).getSkyEmptinessMap());
@@ -101,7 +100,10 @@ public abstract class LevelChunkMixin implements ExtendedChunk, ChunkAccess {
             method = "<init>(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/ChunkPos;[Lnet/minecraft/world/level/biome/Biome;Lnet/minecraft/world/level/chunk/UpgradeData;Lnet/minecraft/world/level/TickList;Lnet/minecraft/world/level/TickList;J[Lnet/minecraft/world/level/chunk/LevelChunkSection;Ljava/util/function/Consumer;)V",
             at = @At("TAIL")
     )
-    public void onConstruct(Level world, ChunkPos chunkPos, Biome[] biomes, UpgradeData upgradeData, TickList tickList, TickList tickList2, long l, LevelChunkSection[] levelChunkSections, Consumer consumer, CallbackInfo ci) {
+    public void onConstruct(final Level world, final ChunkPos chunkPos, Biome[] biomes,
+                            final UpgradeData upgradeData, final TickList<Block> tickList, final TickList<Fluid> tickList2,
+                            final long l, final @Nullable LevelChunkSection[] levelChunkSections, final @Nullable Consumer<LevelChunk> consumer,
+                            CallbackInfo ci) {
         this.blockNibbles = StarLightEngine.getFilledEmptyLight(world);
         this.skyNibbles = StarLightEngine.getFilledEmptyLight(world);
     }

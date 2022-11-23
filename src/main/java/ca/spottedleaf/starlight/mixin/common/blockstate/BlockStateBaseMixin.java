@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.AbstractStateHolder;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateHolder;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BlockState.class)
-public abstract class BlockStateBaseMixin extends AbstractStateHolder<Block, BlockState> implements StateHolder<BlockState>, ExtendedAbstractBlockState {
+public abstract class BlockStateBaseMixin extends AbstractStateHolder<Block, BlockState> implements ExtendedAbstractBlockState {
 
     @Shadow
     @Final
@@ -25,14 +24,16 @@ public abstract class BlockStateBaseMixin extends AbstractStateHolder<Block, Blo
     @Shadow
     private BlockState.Cache cache;
 
+    @Shadow public abstract boolean canOcclude();
+
     @Unique
     private int opacityIfCached;
 
     @Unique
     private boolean isConditionallyFullOpaque;
 
-    protected BlockStateBaseMixin(final Block object, ImmutableMap<Property<?>, Comparable<?>> immutableMap) {
-        super(object, immutableMap);
+    protected BlockStateBaseMixin(Block block, ImmutableMap<Property<?>, Comparable<?>> immutableMap) {
+        super(block, immutableMap);
     }
 
     /**
@@ -43,14 +44,16 @@ public abstract class BlockStateBaseMixin extends AbstractStateHolder<Block, Blo
             at = @At("RETURN")
     )
     public void initLightAccessState(final CallbackInfo ci) {
-        this.isConditionallyFullOpaque = this.useShapeForLightOcclusion;
+        this.isConditionallyFullOpaque = this.canOcclude() & this.useShapeForLightOcclusion;
         this.opacityIfCached = this.cache == null || this.isConditionallyFullOpaque ? -1 : this.cache.lightBlock;
     }
 
+    @Override
     public final boolean isConditionallyFullOpaque() {
         return this.isConditionallyFullOpaque;
     }
 
+    @Override
     public final int getOpacityIfCached() {
         return this.opacityIfCached;
     }

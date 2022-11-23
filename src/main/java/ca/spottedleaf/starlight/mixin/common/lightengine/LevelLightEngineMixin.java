@@ -60,9 +60,9 @@ public abstract class LevelLightEngineMixin implements LightEventListener, StarL
                           final CallbackInfo ci) {
         // avoid ClassCastException in cases where custom LightChunkGetters do not return a Level from getLevel()
         if (chunkProvider.getLevel() instanceof Level) {
-            this.lightEngine = new StarLightInterface(chunkProvider, hasSkyLight, hasBlockLight, (LevelLightEngine) (Object) this);
+            this.lightEngine = new StarLightInterface(chunkProvider, hasSkyLight, hasBlockLight, (LevelLightEngine)(Object)this);
         } else {
-            this.lightEngine = new StarLightInterface(null, hasSkyLight, hasBlockLight, (LevelLightEngine) (Object) this);
+            this.lightEngine = new StarLightInterface(null, hasSkyLight, hasBlockLight, (LevelLightEngine)(Object)this);
         }
         // intentionally destroy mods hooking into old light engine state
         this.blockEngine = null;
@@ -141,9 +141,7 @@ public abstract class LevelLightEngineMixin implements LightEventListener, StarL
      * @author Spottedleaf
      */
     @Overwrite
-    public void queueSectionData(LightLayer lightLayer, SectionPos sectionPos, @Nullable DataLayer dataLayer) {
-
-    }
+    public void queueSectionData(final LightLayer lightType, final SectionPos pos, @Nullable final DataLayer nibble) {}
 
     /**
      * @reason Avoid messing with the vanilla light engine state
@@ -153,21 +151,6 @@ public abstract class LevelLightEngineMixin implements LightEventListener, StarL
     public void retainData(final ChunkPos pos, final boolean retainData) {
         // not used by new light impl
     }
-
-    /**
-     * @reason Need to use our own hooks for retrieving light data
-     * @author Spottedleaf
-     */
-    /*
-    @Overwrite
-    public int getRawBrightness(final BlockPos pos, final int ambientDarkness) {
-        // need to use new light hooks for this
-        final int sky = this.lightEngine.getSkyReader().getLightValue(pos) - ambientDarkness;
-        final int block = this.lightEngine.getBlockReader().getLightValue(pos);
-        return Math.max(sky, block);
-    }
-
-     */
 
     @Unique
     protected final Long2ObjectOpenHashMap<SWMRNibbleArray[]> blockLightMap = new Long2ObjectOpenHashMap<>();

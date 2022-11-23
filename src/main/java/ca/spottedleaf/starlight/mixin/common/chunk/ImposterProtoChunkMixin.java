@@ -19,7 +19,7 @@ public abstract class ImposterProtoChunkMixin extends ProtoChunk implements Chun
     @Shadow
     private LevelChunk wrapped;
 
-    public ImposterProtoChunkMixin(ChunkPos chunkPos, UpgradeData upgradeData) {
+    public ImposterProtoChunkMixin(final ChunkPos chunkPos, final UpgradeData upgradeData) {
         super(chunkPos, upgradeData);
     }
 

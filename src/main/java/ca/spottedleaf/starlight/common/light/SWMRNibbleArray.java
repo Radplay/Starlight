@@ -54,7 +54,7 @@ public final class SWMRNibbleArray {
 
     protected byte[] storageUpdating;
     protected boolean updatingDirty; // only returns whether storageUpdating is dirty
-    protected byte[] storageVisible;
+    protected volatile byte[] storageVisible;
 
     public SWMRNibbleArray() {
         this(null, false); // lazy init
@@ -177,13 +177,17 @@ public final class SWMRNibbleArray {
         final byte[] src = other.storageUpdating;
         final byte[] into;
 
-        if (this.storageUpdating != null) {
-            into = this.storageUpdating;
+        if (!this.updatingDirty) {
+            if (this.storageUpdating != null) {
+                into = this.storageUpdating = allocateBytes();
+            } else {
+                this.storageUpdating = into = allocateBytes();
+                this.stateUpdating = INIT_STATE_INIT;
+            }
+            this.updatingDirty = true;
         } else {
-            this.storageUpdating = into = allocateBytes();
-            this.stateUpdating = INIT_STATE_INIT;
+            into = this.storageUpdating;
         }
-        this.updatingDirty = true;
 
         final int start = 0;
         final int end = (15 | (15 << 4)) >>> 1;
@@ -395,18 +399,16 @@ public final class SWMRNibbleArray {
 
     // operation type: visible
     public int getVisible(final int index) {
-        synchronized (this) {
-            // indices range from 0 -> 4096
-            final byte[] visibleBytes = this.storageVisible;
-            if (visibleBytes == null) {
-                return 0;
-            }
-            final byte value = visibleBytes[index >>> 1];
-
-            // if we are an even index, we want lower 4 bits
-            // if we are an odd index, we want upper 4 bits
-            return ((value >>> ((index & 1) << 2)) & 0xF);
+        // indices range from 0 -> 4096
+        final byte[] visibleBytes = this.storageVisible;
+        if (visibleBytes == null) {
+            return 0;
         }
+        final byte value = visibleBytes[index >>> 1];
+
+        // if we are an even index, we want lower 4 bits
+        // if we are an odd index, we want upper 4 bits
+        return ((value >>> ((index & 1) << 2)) & 0xF);
     }
 
     // operation type: updating

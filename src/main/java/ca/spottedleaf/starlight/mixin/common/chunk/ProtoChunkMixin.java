@@ -85,6 +85,6 @@ public abstract class ProtoChunkMixin implements ChunkAccess, ExtendedChunk {
                             final ProtoTickList<Block> protoTickList, final ProtoTickList<Fluid> protoTickList2,
                             final CallbackInfo ci) {
         this.blockNibbles = StarLightEngine.getFilledEmptyLight();
-        this.skyNibbles =  StarLightEngine.getFilledEmptyLight();
+        this.skyNibbles = StarLightEngine.getFilledEmptyLight();
     }
 }

@@ -154,8 +154,7 @@ public abstract class ThreadedLevelLightEngineMixin extends LevelLightEngine imp
      * @author Spottedleaf
      */
     @Overwrite
-    public void queueSectionData(LightLayer lightLayer, SectionPos sectionPos, @Nullable DataLayer dataLayer) {
-
+    public void queueSectionData(final LightLayer lightType, final SectionPos pos, final @Nullable DataLayer nibbles) {
         // load hooks inside ChunkSerializer
     }
 
