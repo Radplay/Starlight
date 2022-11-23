@@ -8,6 +8,8 @@ Credits:
 
 [1.14.x backport by KingContaria](https://github.com/KingContaria/Starlight-1.14)
 
+Special thanks to @KingContaria for providing updated source code for 1.14.x - 1.16.x
+
 ## Known Issues
 At this point in Starlight's development, I expect problems with mod conflicts.
 
