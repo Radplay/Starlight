@@ -14,7 +14,11 @@ Special thanks to [KingContaria](https://github.com/KingContaria) for providing 
 At this point in Starlight's development, I expect problems with mod conflicts.
 
 ## Download
-[CurseForge (Fabric)](https://www.curseforge.com/minecraft/mc-mods/starlight)
+**Starlight Legacy download**<br>
+[![modrinth](https://img.shields.io/badge/dynamic/json?color=158000&label=downloads&prefix=+%20&query=downloads&url=https://api.modrinth.com/v2/project/N6SNVyVO?style=social&logo=modrinth)](https://modrinth.com/mod/starlight-legacy)
+[![github](https://img.shields.io/github/downloads/Radplay/Starlight-Legacy/total?style=social)](https://github.com/Radplay/Starlight-Legacy/releases)<br>
+**Starlight download**<br>
+[CurseForge (Fabric)](https://www.curseforge.com/minecraft/mc-mods/starlight)<br>
 [Modrinth (Fabric)](https://modrinth.com/mod/starlight)
 
 ## Contact
